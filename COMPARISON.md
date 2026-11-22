@@ -61,7 +61,18 @@ Two fresh-process runs of the shipped `main.ts` produce byte-identical
 `{"type": "module"}` and does not change `run()` output; the final tree was
 re-graded after adding it).
 
-## Coverage of the practice set
+## Post-revision fix (before submit)
+
+Self-review after the revision caught a latent corner in the fused word
+counter: it treated only ASCII whitespace as separators, while the reference
+counts `/\S+/g` (JavaScript's `\s` set, which also splits on NBSP, Ogham
+space mark, en/em spaces, line/paragraph separators, narrow NBSP, medium
+math space, ideographic space and BOM). A scored-set body holding e.g. a
+non-breaking space between words would have miscounted `reading_minutes`.
+`countWords` now uses the full `\s` set. Verified: byte-diff vs the baseline
+still identical on all 3 practice cases, determinism sha unchanged
+(`25980928…`), grade-local still 3/3, passed=1. Shipped as commit C4 on top
+of C3; the beacon root (C1) is untouched.
 
 The practice reports exercise broken links (157/174/280 per case), drafts
 (31/26/43) and refused sources (5/23/24). NOT exercised by the practice set:

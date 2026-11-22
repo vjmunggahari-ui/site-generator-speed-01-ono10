@@ -297,11 +297,19 @@ function trimLine(line) {
 }
 
 function countWords(line) {
+  // Runs of non-whitespace, with JavaScript's \s set (the /\S+/g the
+  // reference counts with) — ASCII whitespace plus NBSP, Ogham space mark,
+  // en/em spaces, line/paragraph separators, narrow NBSP, medium math space,
+  // ideographic space and BOM. ASCII-only checks would miscount a body
+  // holding e.g. a non-breaking space.
   let n = 0;
   let inWord = false;
   for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    const ws = c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\v' || c === '\f';
+    const code = line.charCodeAt(i);
+    const ws = code === 32 || code === 9 || code === 10 || code === 11 || code === 12 || code === 13 ||
+      code === 0x00a0 || code === 0x1680 || (code >= 0x2000 && code <= 0x200a) ||
+      code === 0x2028 || code === 0x2029 || code === 0x202f || code === 0x205f ||
+      code === 0x3000 || code === 0xfeff;
     if (ws) inWord = false;
     else if (!inWord) {
       inWord = true;
